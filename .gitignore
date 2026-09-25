@@ -12,3 +12,6 @@ dist/
 .playwright-mcp/
 lt-*.png
 .impeccable/
+
+# Local workflow specs / scratch (not for committing)
+odd/

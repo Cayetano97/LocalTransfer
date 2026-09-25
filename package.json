@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "LocalTransfer — LAN peer-to-peer file sharing with WebRTC (Vite + TypeScript + Trystero).",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -1,0 +1,23 @@
+{
+  "name": "localtransfer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "LocalTransfer — LAN peer-to-peer file sharing with WebRTC (Vite + TypeScript + Trystero).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lan": "node scripts/lan-cert.mjs && vite --host"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "trystero": "^0.25.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/qrcode": "^1.5.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}

@@ -1,0 +1,14 @@
+localtransfer/
+node_modules/
+dist/
+*.tsbuildinfo
+*.local
+.DS_Store
+.certs/
+
+/.atl
+
+# Local inspection artifacts (critique screenshots, browser MCP, impeccable archive)
+.playwright-mcp/
+lt-*.png
+.impeccable/

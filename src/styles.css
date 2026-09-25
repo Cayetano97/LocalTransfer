@@ -1,0 +1,1030 @@
+/* LocalTransfer — minimalist warm-monochrome, mobile-first, WCAG 2.1 AA.
+ * Tokens: bone canvas, 1px hairlines, scarce color, 44px targets, visible focus.
+ * NOTE: muted grays are darkened vs. classic minimal palettes on purpose:
+ * #787774 on white is 4.48:1 (fails AA) so we use #5F5E5B (6.48:1). */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f7f6f3;
+  --text: #111110;
+  --muted: #5f5e5b;
+  --line: #eae8e3;
+  --control-border: #6b6a66;
+  --primary: #1d4ed8;
+  --primary-ink: #ffffff;
+  --primary-hover: #1a45bd;
+  --accent-soft: #e4ebfe;
+  --accent-border: #b9c8f8;
+  --focus: #1d4ed8;
+  --danger-bg: #fdebec;
+  --danger-text: #9f2f2d;
+  --danger-border: #f3c2c4;
+  --online-dot: #2e7d32;
+  --online-bg: #edf3ec;
+  --online-text: #346538;
+  --radius: 12px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(17, 17, 16, 0.04);
+  --shadow-lift: 0 4px 14px rgba(29, 78, 216, 0.18);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --font-sans: "SF Pro Display", "Geist Sans", "Helvetica Neue", "Switzer", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "SF Mono", "Geist Mono", ui-monospace, "JetBrains Mono", monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #141412;
+  --surface: #1c1c1a;
+  --surface-2: #232320;
+  --text: #f2f1ed;
+  --muted: #b9b7b0;
+  --line: rgba(255, 255, 255, 0.09);
+  --control-border: #9a988f;
+  --primary: #8ab4ff;
+  --primary-ink: #0b1226;
+  --primary-hover: #a5c2ff;
+  --accent-soft: rgba(138, 180, 255, 0.12);
+  --accent-border: rgba(138, 180, 255, 0.35);
+  --focus: #8ab4ff;
+  --danger-bg: rgba(253, 235, 236, 0.08);
+  --danger-text: #f3a3a5;
+  --danger-border: rgba(243, 163, 165, 0.35);
+  --online-dot: #6fbf73;
+  --online-bg: rgba(237, 243, 236, 0.08);
+  --online-text: #a9d3ac;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] {
+    --bg: #141412;
+    --surface: #1c1c1a;
+    --surface-2: #232320;
+    --text: #f2f1ed;
+    --muted: #b9b7b0;
+    --line: rgba(255, 255, 255, 0.09);
+    --control-border: #9a988f;
+    --primary: #8ab4ff;
+    --primary-ink: #0b1226;
+    --primary-hover: #a5c2ff;
+    --accent-soft: rgba(138, 180, 255, 0.12);
+    --accent-border: rgba(138, 180, 255, 0.35);
+    --focus: #8ab4ff;
+    --danger-bg: rgba(253, 235, 236, 0.08);
+    --danger-text: #f3a3a5;
+    --danger-border: rgba(243, 163, 165, 0.35);
+    --online-dot: #6fbf73;
+    --online-bg: rgba(237, 243, 236, 0.08);
+    --online-text: #a9d3ac;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Screen-reader only + skip link (WCAG 2.4.1) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 1rem;
+  z-index: 100;
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus-visible {
+  top: 0.6rem;
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Topbar: brand left, utilities right. Compact 56px so chrome fits 100dvh. */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  min-height: 56px;
+  max-height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  flex: none;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.logo {
+  width: 24px;
+  height: 24px;
+  color: var(--primary);
+  flex: none;
+  transition: transform 200ms var(--ease-out), color 200ms ease;
+}
+
+.brand:hover .logo {
+  transform: scale(1.06) rotate(-3deg);
+}
+
+.brand-name {
+  font-weight: 650;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.room-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--primary);
+  border: 1px solid var(--accent-border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 38vw;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-2);
+  padding: 2px;
+  gap: 2px;
+}
+
+.btn.lang-btn {
+  border: 0;
+  border-radius: 6px;
+  min-height: 36px;
+  min-width: 44px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.25;
+  background: transparent;
+}
+
+.btn.lang-btn.active {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.btn.icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.layout {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0.6rem 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.9rem;
+}
+
+.card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-wrap: balance;
+}
+
+.card h3 {
+  margin: 0.6rem 0 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.card p {
+  max-width: 65ch;
+}
+
+/* Entry: one small centered form — create with a name or join by id. */
+.entry {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 0;
+  padding: 0.5rem 0;
+}
+
+.entry-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 1.25rem 1.25rem 1.1rem;
+}
+
+.entry-card h2 {
+  margin: 0 0 0.3rem;
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.entry-card .muted {
+  margin: 0 0 0.35rem;
+  max-width: none;
+}
+
+.entry-card .field {
+  margin: 0.35rem 0;
+}
+
+.entry-card .btn-row {
+  margin-top: 0.65rem;
+}
+
+/* Segmented entry mode: Crear | Unirse — native radios, 44px segments. */
+.mode-switch {
+  display: flex;
+  gap: 4px;
+  min-inline-size: 0;
+  margin: 0.55rem 0 0.35rem;
+  padding: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.mode-option {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.mode-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.mode-option span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.3rem 0.6rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 7px;
+  color: var(--muted);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.mode-option input:checked + span {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.mode-option input:focus-visible + span {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Helper under a field: regular weight, AA-muted. */
+.field .field-help {
+  font-weight: 400;
+}
+
+.count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.4rem 0;
+  font-size: 0.88rem;
+}
+
+.field > span {
+  font-weight: 600;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+input[type="text"],
+select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  width: 100%;
+  min-height: 44px;
+}
+
+input[type="text"]:hover,
+select:hover {
+  border-color: var(--text);
+}
+
+input[type="text"]:focus,
+select:focus {
+  border-color: var(--primary);
+}
+
+input[type="text"],
+select {
+  transition: border-color 160ms var(--ease-out), background-color 160ms ease, box-shadow 160ms var(--ease-out);
+}
+
+input[type="text"]:focus-visible,
+select:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+.dropzone:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Buttons: primary left, secondary middle, danger pushed right and separated. */
+.btn-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.btn {
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: 1px solid var(--control-border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.1rem;
+  min-height: 44px;
+  min-width: 44px;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, border-color 200ms ease, box-shadow 200ms var(--ease-out), color 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    border-color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+.btn:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-2);
+}
+
+.btn.is-success {
+  border-color: var(--online-dot);
+  color: var(--online-text);
+}
+
+.push-right {
+  margin-left: auto;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+.btn-ghost:hover {
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  align-items: start;
+  overflow: visible;
+}
+
+.grid .card {
+  height: fit-content;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid .card > h2,
+.grid .card > h3,
+.grid .card > .dropzone,
+.grid .card > .field {
+  flex: none;
+}
+
+#peerList {
+  flex: none;
+  max-height: 38vh;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.file-scroll {
+  flex: none;
+  overflow: visible;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Only populated lists get their own scroll container — empty state hugs content. */
+.file-queue:not(:empty) {
+  max-height: 32vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.file-scroll .file-queue {
+  margin-top: 0;
+}
+
+.file-queue:empty {
+  display: none;
+}
+
+.file-scroll h3 {
+  margin-top: 0.2rem;
+}
+
+/* Empty-state copy under each list; hidden once the list has items. */
+.list-empty {
+  margin: 0;
+  padding: 0.65rem 0.7rem;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.file-queue:not(:empty) + .list-empty {
+  display: none;
+}
+
+/* Mobile segmented control: owns no height on desktop. */
+.panel-tabs {
+  display: flex;
+  gap: 4px;
+  flex: none;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tab {
+  flex: 1;
+  border-color: transparent;
+  background: transparent;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease;
+}
+
+.tab:active {
+  transform: scale(0.97);
+}
+
+.tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+
+body[data-panel="peers"] #filesCard,
+body[data-panel="files"] #peersCard {
+  display: none;
+}
+
+/* Connected workspace: room actions + tabs + peers/files fill the viewport.
+ * Base layout lives OUTSIDE media queries so the joined view fills the
+ * viewport at every width; only width-specific deltas go inside. */
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
+.room-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+  flex-wrap: wrap;
+}
+
+.room-actions .qr-fig {
+  margin: 0;
+  flex: none;
+}
+
+.room-actions #qrCanvas {
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .panel-tabs {
+    display: none;
+  }
+
+  body[data-panel="peers"] #filesCard,
+  body[data-panel="files"] #peersCard {
+    display: block;
+  }
+
+  #filesCard[hidden] {
+    display: block;
+  }
+
+  .grid {
+    grid-template-columns: minmax(260px, 340px) 1fr;
+  }
+}
+
+.peer-list,
+.file-queue {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Staggered entry: decorative cascade, 40ms steps, never blocks interaction. */
+.peer-list .peer,
+.file-queue .file-item {
+  animation: rise-in 260ms var(--ease-out) backwards;
+}
+
+.peer-list .peer:nth-child(2),
+.file-queue .file-item:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.peer-list .peer:nth-child(3),
+.file-queue .file-item:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.peer-list .peer:nth-child(n + 4),
+.file-queue .file-item:nth-child(n + 4) {
+  animation-delay: 120ms;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.peer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.peer .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--online-dot);
+  flex: none;
+}
+
+.peer .name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.peer .id {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  flex: none;
+}
+
+/* Self row: inline rename affordance (44px target), id hugs the button. */
+.peer.self {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.peer.self .id {
+  margin-left: 0.35rem;
+}
+
+.peer .peer-rename {
+  margin-left: auto;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.peer .peer-rename-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Empty/waiting rows in the peers list: quiet dashed callout. */
+.peer-list li.muted {
+  padding: 0.6rem 0.7rem;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+/* Relay signalling down: distinguish from the friendly waiting copy. */
+.peer-list li.muted.is-error {
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+.dropzone {
+  border: 1.5px dashed var(--control-border);
+  border-radius: var(--radius);
+  padding: 0.85rem 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  margin: 0.3rem 0 0.45rem;
+  background: var(--surface);
+  transition: border-color 200ms var(--ease-out), background-color 200ms ease, transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dropzone:hover {
+    border-color: var(--primary);
+    background: var(--accent-soft);
+    transform: translateY(-1px);
+  }
+}
+
+.dropzone.over {
+  border-color: var(--primary);
+  border-style: solid;
+  background: var(--accent-soft);
+  transform: scale(1.01);
+  box-shadow: var(--shadow-lift);
+}
+
+.dropzone p {
+  margin: 0.2rem 0;
+}
+
+.dropzone p:first-child {
+  margin-top: 0;
+}
+
+.dropzone p:last-child {
+  margin-bottom: 0;
+}
+
+.dropzone .link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.file-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  background: var(--surface);
+}
+
+.file-item .row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.file-item .fname {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-item progress {
+  width: 100%;
+  height: 8px;
+  accent-color: var(--primary);
+}
+
+.file-item .status {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.file-item .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.file-item .actions .btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  min-height: 36px;
+}
+
+.file-item a {
+  color: var(--primary);
+  font-weight: 600;
+  text-underline-offset: 3px;
+  align-self: flex-start;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  transition: color 160ms ease, transform 160ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .file-item a:hover {
+    color: var(--primary-hover);
+  }
+}
+
+.file-item a:active {
+  transform: scale(0.97);
+}
+
+.foot {
+  flex: none;
+  text-align: center;
+  padding: 0.25rem 0 0.1rem;
+}
+
+.toasts {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 50;
+  width: min(92vw, 420px);
+}
+
+.toast {
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  box-shadow: var(--shadow);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 250ms var(--ease-out), transform 250ms var(--ease-spring);
+}
+
+@starting-style {
+  .toast {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+#themeIcon {
+  transition: transform 250ms var(--ease-out);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  .brand-name {
+    max-width: 32vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card {
+    padding: 0.8rem;
+  }
+
+  .room-badge {
+    max-width: 30vw;
+  }
+}
+
+/* Mobile: QR is useless on the phone itself; copy-link stays full row. */
+@media (max-width: 767px) {
+  .room-actions .qr-fig {
+    display: none;
+  }
+
+  #copyLinkBtn {
+    flex: 1;
+  }
+}
+
+/* Short viewports: tighten chrome; the privacy line stays visible. */
+@media (max-height: 740px) {
+  .entry-card {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+  }
+
+  .topbar {
+    min-height: 52px;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .room-actions .qr-fig {
+    display: none;
+  }
+
+  .dropzone {
+    padding: 0.65rem 0.6rem;
+  }
+
+  /* Keep #dropNote visible: recover the space with tighter spacing. */
+  .dropzone p {
+    margin: 0.1rem 0;
+  }
+
+  #dropNote {
+    font-size: 0.8rem;
+  }
+
+  .peer {
+    min-height: 40px;
+    padding: 0.45rem 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
